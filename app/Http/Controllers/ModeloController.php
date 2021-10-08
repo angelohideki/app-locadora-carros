@@ -19,13 +19,22 @@ class ModeloController extends Controller
      */
     public function index(Request $request)
     {
+        // http://127.0.0.1:8000/api/modelo?atributos=id,nome,marca_id
+        // http://127.0.0.1:8000/api/modelo?atributos=id,nome,marca_id&atributos_marca=nome,imagem
         $modelos = array();
+
+        if($request->has('atributos_marca')) {
+            $atributos_marca = $request->atributos_marca;
+            $modelos = $this->modelo->with('marca:id,'.$atributos_marca);
+        } else {
+            $modelos = $this->modelo->with('marca');
+        }
 
         if($request->has('atributos')) {
             $atributos = $request->atributos;
-            $modelos = $this->modelo->selectRaw($atributos)->with('marca')->get();
+            $modelos = $modelos->selectRaw($atributos)->get();
         } else {
-            $modelos = $this->modelo->with('marca')->get();
+            $modelos = $modelos->get();
         }
 
         //$this->modelo->with('marca')->get()
