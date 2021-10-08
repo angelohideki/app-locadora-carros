@@ -21,6 +21,7 @@ class ModeloController extends Controller
     {
         // http://127.0.0.1:8000/api/modelo?atributos=id,nome,marca_id
         // http://127.0.0.1:8000/api/modelo?atributos=id,nome,marca_id&atributos_marca=nome,imagem
+        //http://127.0.0.1:8000/api/modelo?atributos=id,nome,abs,numero_portas,marca_id&atributos_marca=nome,imagem&filtros=abs:=:1;numero_portas:=:4
         $modelos = array();
 
         if($request->has('atributos_marca')) {
@@ -28,6 +29,16 @@ class ModeloController extends Controller
             $modelos = $this->modelo->with('marca:id,'.$atributos_marca);
         } else {
             $modelos = $this->modelo->with('marca');
+        }
+
+        if($request->has('filtro')) {
+            $filtros = explode(';', $request->filtro);
+            foreach($filtros as $key => $condicao) {
+
+                $c = explode(':', $condicao);
+                $modelos = $modelos->where($c[0], $c[1], $c[2]);
+
+            }
         }
 
         if($request->has('atributos')) {
